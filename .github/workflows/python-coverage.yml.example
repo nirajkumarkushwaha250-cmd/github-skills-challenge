@@ -11,25 +11,26 @@ permissions:
 jobs:
   python-coverage:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.13
+          python-version: "3.13"
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pytest==8.4.1
-          pip install coverage==7.9
-          pip install pytest-cov==6.2.1
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest==8.4.1 coverage pytest-cov
 
       - name: Run tests and generate coverage details
-        run: pytest --cov=src
+        run: pytest --cov=src --verbose --cov-report=term-missing --cov-report=xml
 
       - name: Coverage comment
         uses: py-cov-action/python-coverage-comment-action@v3
@@ -39,4 +40,4 @@ jobs:
           MINIMUM_ORANGE: 70
 
       - name: Fail if below threshold
-        run: coverage report --fail-under=90
+        run: python -m coverage report --fail-under=90
